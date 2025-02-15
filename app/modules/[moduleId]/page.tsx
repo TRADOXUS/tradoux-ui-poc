@@ -1,19 +1,16 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useParams } from 'next/navigation';
 import { modules } from '../../lib/data/modules';
 import { ProgressBar } from '../../components/ui/progress-bar';
 import Link from 'next/link';
 
-interface ModulePageProps {
-  params: {
-    moduleId: string;
-  };
-}
+export default function ModulePage() {
+  const params = useParams();
+  const moduleId = Number.parseInt(params.moduleId as string);
+  const currentModule = modules.find(m => m.id === moduleId);
 
-export default function ModulePage({ params }: ModulePageProps) {
-  const moduleId = parseInt(params.moduleId);
-  const module = modules.find(m => m.id === moduleId);
-
-  if (!module) {
+  if (!currentModule) {
     notFound();
   }
 
@@ -24,10 +21,10 @@ export default function ModulePage({ params }: ModulePageProps) {
         <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <span className="text-4xl">{module.icon}</span>
+              <span className="text-4xl">{currentModule.icon}</span>
               <div>
-                <h1 className="text-3xl font-bold mb-2">{module.title}</h1>
-                <p className="text-gray-600">{module.description}</p>
+                <h1 className="text-3xl font-bold mb-2">{currentModule.title}</h1>
+                <p className="text-gray-600">{currentModule.description}</p>
               </div>
             </div>
             <Link 
@@ -40,19 +37,19 @@ export default function ModulePage({ params }: ModulePageProps) {
           
           <div className="flex items-center gap-3 mb-2">
             <span className="text-lg font-medium">Module Progress</span>
-            <span className="text-gray-500">{module.progress}% Complete</span>
+            <span className="text-gray-500">{currentModule.progress}% Complete</span>
           </div>
-          <ProgressBar progress={module.progress} size="lg" showLabel />
+          <ProgressBar progress={currentModule.progress} size="lg" showLabel />
         </div>
 
         {/* Capsules List */}
         <div className="bg-white rounded-lg shadow-sm p-8">
           <h2 className="text-2xl font-bold mb-6">Learning Capsules</h2>
           <div className="space-y-4">
-            {module.capsules.map((capsule) => (
+            {currentModule.capsules.map((capsule) => (
               <Link
                 key={capsule.id}
-                href={`/modules/${module.id}/capsules/${capsule.id}`}
+                href={`/modules/${currentModule.id}/capsules/${capsule.id}`}
                 className="block p-4 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors"
               >
                 <div className="flex items-center justify-between">

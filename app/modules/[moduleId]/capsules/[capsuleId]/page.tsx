@@ -1,22 +1,18 @@
-import { notFound } from 'next/navigation';
+"use client";
+
+import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { modules } from '../../../../lib/data/modules';
 
-interface CapsulePageProps {
-  params: {
-    moduleId: string;
-    capsuleId: string;
-  };
-}
-
-export default function CapsulePage({ params }: CapsulePageProps) {
-  const moduleId = Number.parseInt(params.moduleId);
-  const capsuleId = Number.parseInt(params.capsuleId);
+export default function CapsulePage() {
+  const params = useParams();
+  const moduleId = Number.parseInt(params.moduleId as string);
+  const capsuleId = Number.parseInt(params.capsuleId as string);
   
-  const module = modules.find(m => m.id === moduleId);
-  const capsule = module?.capsules.find(c => c.id === capsuleId);
+  const currentModule = modules.find(m => m.id === moduleId);
+  const capsule = currentModule?.capsules.find(c => c.id === capsuleId);
 
-  if (!module || !capsule) {
+  if (!currentModule || !capsule) {
     notFound();
   }
 
@@ -29,8 +25,8 @@ export default function CapsulePage({ params }: CapsulePageProps) {
             Modules
           </Link>
           <span>→</span>
-          <Link href={`/modules/${module.id}`} className="hover:text-blue-600">
-            {module.title}
+          <Link href={`/modules/${currentModule.id}`} className="hover:text-blue-600">
+            {currentModule.title}
           </Link>
           <span>→</span>
           <span className="text-gray-900">{capsule.title}</span>
@@ -66,9 +62,9 @@ export default function CapsulePage({ params }: CapsulePageProps) {
               <div className="bg-white rounded-lg shadow-sm p-8">
                 <h2 className="text-2xl font-bold mb-6">Examples</h2>
                 <div className="space-y-4">
-                  {capsule.examples.map((example, index) => (
+                  {capsule.examples.map((example) => (
                     <div 
-                      key={index}
+                      key={`example-${example.substring(0, 20)}`}
                       className="p-4 bg-gray-50 rounded-lg border border-gray-100"
                     >
                       <p>{example}</p>
@@ -83,21 +79,24 @@ export default function CapsulePage({ params }: CapsulePageProps) {
               <div className="bg-white rounded-lg shadow-sm p-8">
                 <h2 className="text-2xl font-bold mb-6">Exercises</h2>
                 <div className="space-y-8">
-                  {capsule.exercises.map((exercise, index) => (
-                    <div key={index} className="space-y-4">
+                  {capsule.exercises.map((exercise) => (
+                    <div 
+                      key={`exercise-${exercise.question.substring(0, 20)}`} 
+                      className="space-y-4"
+                    >
                       <h3 className="text-lg font-medium">
                         {exercise.question}
                       </h3>
                       {exercise.options && (
                         <div className="space-y-2">
-                          {exercise.options.map((option, optIndex) => (
+                          {exercise.options.map((option) => (
                             <label 
-                              key={optIndex}
+                              key={`option-${option.substring(0, 20)}`}
                               className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer"
                             >
                               <input 
                                 type="radio" 
-                                name={`question-${index}`}
+                                name={`question-${exercise.question.substring(0, 20)}`}
                                 className="w-4 h-4 text-blue-600"
                               />
                               <span>{option}</span>
@@ -118,10 +117,10 @@ export default function CapsulePage({ params }: CapsulePageProps) {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4">Module Progress</h2>
               <div className="space-y-4">
-                {module.capsules.map((cap) => (
+                {currentModule.capsules.map((cap) => (
                   <Link
                     key={cap.id}
-                    href={`/modules/${module.id}/capsules/${cap.id}`}
+                    href={`/modules/${currentModule.id}/capsules/${cap.id}`}
                     className={`block p-3 rounded-lg ${
                       cap.id === capsule.id 
                         ? 'bg-blue-50 border-blue-200' 
